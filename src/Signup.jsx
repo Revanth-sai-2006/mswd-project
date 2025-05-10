@@ -5,7 +5,8 @@ import {
   Button,
   Typography,
   Box,
-  Paper
+  Paper,
+  MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -16,7 +17,10 @@ import axios from 'axios';
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmpassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('user'); // default role
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,7 +29,10 @@ const Signup = () => {
     const newErrors = {};
     if (!name) newErrors.name = "Full Name is required";
     if (!email) newErrors.email = "Email is required";
+    if (!phone) newErrors.phone = "Phone number is required";
     if (!password) newErrors.password = "Password is required";
+    if (!confirmpassword) newErrors.confirmpassword = "Please confirm your password";
+    if (password !== confirmpassword) newErrors.confirmpassword = "Passwords do not match";
     return newErrors;
   };
 
@@ -39,10 +46,8 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post('https://your-api-url.com/user/signup', {
-        name,
-        email,
-        password
+      const response = await axios.post('http://localhost:5173/users', {
+        name, email, phone, password, confirmpassword, role
       });
 
       const { token, user } = response.data;
@@ -84,7 +89,6 @@ const Signup = () => {
               fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
               error={Boolean(errors.name)}
               helperText={errors.name}
             />
@@ -94,9 +98,17 @@ const Signup = () => {
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               error={Boolean(errors.email)}
               helperText={errors.email}
+            />
+            <TextField
+              label="Phone"
+              type="tel"
+              fullWidth
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              error={Boolean(errors.phone)}
+              helperText={errors.phone}
             />
             <TextField
               label="Password"
@@ -104,10 +116,30 @@ const Signup = () => {
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               error={Boolean(errors.password)}
               helperText={errors.password}
             />
+            <TextField
+              label="Confirm Password"
+              type="password"
+              fullWidth
+              value={confirmpassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={Boolean(errors.confirmpassword)}
+              helperText={errors.confirmpassword}
+            />
+            {/* Hidden input or dropdown if needed */}
+            <TextField
+              label="Role"
+              select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              fullWidth
+              disabled
+            >
+              <MenuItem value="user">User</MenuItem>
+            </TextField>
+
             <Button
               type="submit"
               variant="contained"
